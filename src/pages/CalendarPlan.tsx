@@ -43,6 +43,8 @@ async function addSubject(memberId: number, subjectName: string): Promise<Subjec
     const response = await axios.post<Subject>(`${API_URL}/subjects/members/${memberId}`, {
         name: subjectName
     });
+    console.log('과목 추가 성공:',response.data);
+
     return response.data;
 }
 
@@ -196,42 +198,53 @@ function CalendarPlan() {
         }
     };
 
-
+    // 과목 삭제
     // 과목 삭제 처리 함수
     const handleDeleteSubject = async (subjectId: number) => {
         try {
-            if (currentDateKey) {
-                await deleteSubject(subjectId); // 과목과 과제 삭제
-                const updatedDateTasks = {...dateTasks};
-                for (const subject in updatedDateTasks[currentDateKey]?.subjects) {
-                    if (updatedDateTasks[currentDateKey]?.subjects[subject].subjectId === subjectId) {
-                        delete updatedDateTasks[currentDateKey]?.subjects[subject];
-                        break;
+            await deleteSubject(subjectId); // 과목 삭제 API 호출
+
+            setDateTasks(prevDateTasks => {
+                const updatedDateTasks = { ...prevDateTasks };
+
+                for (const dateKey in updatedDateTasks) {
+                    const subjects = updatedDateTasks[dateKey].subjects;
+                    for (const subjectName in subjects) {
+                        if (subjects[subjectName].subjectId === subjectId) {
+                            delete subjects[subjectName];
+                        }
                     }
                 }
-                setDateTasks(updatedDateTasks);
-            }
+                return updatedDateTasks;
+            });
         } catch (error) {
-            console.error("과목 및 관련 과제 삭제 오류:", error);
+            console.error("과목 삭제 오류:", error);
         }
     };
 
-
-    // 과제 삭제 처리 함수
+    // 과제 삭제
     const handleDeleteTask = async (taskId: number) => {
         try {
-            if (currentDateKey && currentSubject && dateTasks[currentDateKey]?.subjects[currentSubject]) {
-                await deleteTask(taskId); // 과제 삭제
-                const updatedDateTasks = {...dateTasks};
-                const updatedTasks = updatedDateTasks[currentDateKey]?.subjects[currentSubject].tasks.filter(task => task.id !== taskId);
-                updatedDateTasks[currentDateKey].subjects[currentSubject].tasks = updatedTasks || [];
-                setDateTasks(updatedDateTasks);
-            }
+            await deleteTask(taskId); // 과제 삭제 API 호출
+
+            setDateTasks(prevDateTasks => {
+                const updatedDateTasks = { ...prevDateTasks };
+
+                // 각 날짜를 순회하면서 과제를 삭제합니다.
+                for (const dateKey in updatedDateTasks) {
+                    const subjects = updatedDateTasks[dateKey].subjects;
+                    for (const subjectName in subjects) {
+                        const subject = subjects[subjectName];
+                        subject.tasks = subject.tasks.filter(task => task.id !== taskId);
+                    }
+                }
+
+                return updatedDateTasks;
+            });
         } catch (error) {
             console.error("과제 삭제 오류:", error);
         }
     };
-
 
     // 날짜 변경 처리 함수
     const handleDateChange = (index: number) => {
