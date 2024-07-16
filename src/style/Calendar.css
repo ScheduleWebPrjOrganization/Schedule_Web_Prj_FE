@@ -1,0 +1,51 @@
+.calendar-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: Arial, sans-serif;
+}
+
+.Calendar-Title {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.back-home {
+    margin-right: 20px;
+    text-decoration: none;
+    color: #333;
+    align-self: flex-end;
+}
+
+.calendar-container {
+    margin-top: 20px;
+    width: 80%;
+    max-width: 600px;
+    border: 1px solid #ccc;
+    padding: 20px;
+}
+
+.custom-calendar {
+    width: 100%;
+    border: none;
+}
+
+.plan-button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+.plan-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.selected-date {
+    background-color: #007bff;
+    color: #fff !important;
+}
