@@ -55,12 +55,12 @@ async function addSubject(memberId: number, subjectName: string, dateKey: string
     return response.data;
 }
 
-async function addTaskToSubject(subjectId: number, taskName: string, dateKey: string, plannedtime : number): Promise<void> {
+async function addTaskToSubject(subjectId: number, taskName: string, dateKey: string, plannedTime : number): Promise<void> {
     try {
         const response = await axios.post(`${API_URL}/subjects/${subjectId}/tasks`, {
             name: taskName,
             status: "NOT_DONE", // 기본 상태 설정
-            hoursToComplete: time,
+            hoursToComplete: plannedTime,
             dateKey: dateKey
         });
         console.log("Task 추가 성공:", response.data);
@@ -107,7 +107,6 @@ function CalendarPlan() {
     const [newDayInput, setNewDayInput] = useState("");
     // memberId 임의의 값 넣음 실제로는 로그인꺼 사용
     const [memberId, setMemberId] = useState<number>(1);        // 추후 수정 필요.
-    //1
     const currentDate = allDates[currentDateIndex];
     const currentDateKey = currentDate ? dayjs(currentDate).format("YYYY-MM-DD") : null;
 
@@ -322,16 +321,18 @@ function CalendarPlan() {
                     </div>
                     <div className="task">
                         <h3>과제</h3>
-                        <select onChange={(e) => setCurrentSubject(parseInt(e.target.value))} value={currentSubject || ''}>
+                        <select onChange={(e) => setCurrentSubject(parseInt(e.target.value))}
+                                value={currentSubject || ''}>
                             <option value="">과목 선택</option>
                             {subjects.map(subject => (
                                 <option key={subject.id} value={subject.id}>{subject.name}</option>
                             ))}
                         </select>
-                        <input value={newTask} onChange={(e) => setNewTask(e.target.value)} placeholder="새 과제" />
+                        <input value={newTask} onChange={(e) => setNewTask(e.target.value)} placeholder="새 과제"/>
                         <button onClick={addNewTask} disabled={!currentSubject}>과제 추가</button>
-                        <input type="number" value={hours} onChange={(e) => setHours(e.target.value)} placeholder="시간" />
-                        <input type="number" value={minutes} onChange={(e) => setMinutes(e.target.value)} placeholder="분" />
+                        <input type="number" value={hours} onChange={(e) => setHours(e.target.value)} placeholder="시간"/>
+                        <input type="number" value={minutes} onChange={(e) => setMinutes(e.target.value)}
+                               placeholder="분"/>
                     </div>
                 </div>
                 {currentDateKey &&
