@@ -10,7 +10,6 @@ interface Range {
     endDate: string;
 }
 
-
 export interface Subject {
     id: number;
     name: string;
@@ -19,15 +18,22 @@ export interface Subject {
 export interface Task {
     id: number;
     name: string;
+    hours_to_complete: number;
+    member_id: number;
     status: string;
-    hoursToComplete: number;
-    // memberId: number;
-    // subjectId: number;
+    subject_id: number;
+    date_key: string;
 }
+
 // 날짜별 과목 및 과제 인터페이스 정의
 export interface DateTasks {
     [date: string]: {
-        subjects: { [subject: string]: { subjectId: number, tasks: Task[] } };
+        subjects: {
+            [subjectName: string]: {
+                subjectId: number;
+                tasks: Task[];
+            };
+        };
     };
 }
 
@@ -51,11 +57,10 @@ async function addSubject(memberId: number, subjectName: string, dateKey: string
         }
     });
     console.log('과목 추가 성공:', response.data);
-
     return response.data;
 }
 
-async function addTaskToSubject(subjectId: number, taskName: string, dateKey: string, plannedTime : number): Promise<void> {
+async function addTaskToSubject(subjectId: number, taskName: string, dateKey: string, plannedTime: number): Promise<void> {
     try {
         const response = await axios.post(`${API_URL}/subjects/${subjectId}/tasks`, {
             name: taskName,
@@ -68,7 +73,6 @@ async function addTaskToSubject(subjectId: number, taskName: string, dateKey: st
         console.error("Task 추가 오류:", error);
     }
 }
-
 
 async function deleteSubject(subjectId: number): Promise<void> {
     try {
@@ -90,11 +94,9 @@ async function deleteTask(taskId: number): Promise<void> {
     }
 }
 
-
-
 function CalendarPlan() {
-    const location = useLocation();                                             // 라우터를 통해 전달된 상태에서 선택된 날짜 범위 및 중요 일정 정보 가져옴
-    const { selectedRanges, newDay } = location.state || {};                                  // 현재 선택된 날짜의 인덱스 상태
+    const location = useLocation(); // 라우터를 통해 전달된 상태에서 선택된 날짜 범위 및 중요 일정 정보 가져옴
+    const { selectedRanges, newDay } = location.state || {}; // 현재 선택된 날짜의 인덱스 상태
     const [currentDateIndex, setCurrentDateIndex] = useState(0);
     const [allDates, setAllDates] = useState<Date[]>([]);
     const [dateTasks, setDateTasks] = useState<DateTasks>({});
@@ -105,8 +107,9 @@ function CalendarPlan() {
     const [minutes, setMinutes] = useState("");
     const [currentSubject, setCurrentSubject] = useState<number | null>(null);
     const [newDayInput, setNewDayInput] = useState("");
+
     // memberId 임의의 값 넣음 실제로는 로그인꺼 사용
-    const [memberId, setMemberId] = useState<number>(1);        // 추후 수정 필요.
+    const [memberId, setMemberId] = useState<number>(1); // 추후 수정 필요.
     const currentDate = allDates[currentDateIndex];
     const currentDateKey = currentDate ? dayjs(currentDate).format("YYYY-MM-DD") : null;
 
@@ -114,7 +117,7 @@ function CalendarPlan() {
     useEffect(() => {
         const dates: Date[] = [];
         selectedRanges?.forEach((range: Range) => {
-            const {startDate, endDate} = range;
+            const { startDate, endDate } = range;
             if (startDate && endDate) {
                 let currentDate = new Date(startDate);
                 while (currentDate <= new Date(endDate)) {
@@ -127,9 +130,6 @@ function CalendarPlan() {
         setNewDayInput(newDay || ""); // newDay 값 설정
     }, [selectedRanges, newDay]);
 
-
-
-
     // 날짜 범위 선택 후 currentDateKey가 변경될 때마다 데이터를 다시 불러오기
     useEffect(() => {
         if (currentDateKey) {
@@ -140,18 +140,19 @@ function CalendarPlan() {
     const fetchSubjects = async (dateKey: string) => {
         try {
             const subjects = await getSubjectsByMemberId(memberId);
-            const initialDateTasks = {...dateTasks};
+            const initialDateTasks = { ...dateTasks };
             if (!initialDateTasks[dateKey]) {
-                initialDateTasks[dateKey] = {subjects: {}};
+                initialDateTasks[dateKey] = { subjects: {} };
             }
             for (const subject of subjects) {
                 if (!initialDateTasks[dateKey].subjects[subject.name]) {
-                    initialDateTasks[dateKey].subjects[subject.name] = {subjectId: subject.id, tasks: []};
+                    initialDateTasks[dateKey].subjects[subject.name] = { subjectId: subject.id, tasks: [] };
                 }
                 const tasks = await getTasksBySubjectId(subject.id);
                 initialDateTasks[dateKey].subjects[subject.name].tasks = tasks;
             }
             setDateTasks(initialDateTasks);
+            setSubjects(subjects);
         } catch (error) {
             console.error("날짜별 과목 및 과제 불러오기 오류:", error);
         }
@@ -159,30 +160,29 @@ function CalendarPlan() {
 
     // 새 과목 추가 처리 함수
     const addNewSubject = async () => {
-
-        if (!newSubject.trim()) {
-            alert("과목 이름을 입력해주세요.");    // 과목 이름이 공백일 경우 경고
-            return;
-        }
-
-        // 입력된 과목 이름의 공백을 제거한 후 중복 검사 수행
-        const subjectExists = subjects.some(subject => subject.name.toLowerCase() === newSubject.trim().toLowerCase());
-        if (subjectExists) {
-            alert("이미 존재하는 과목입니다.");
-            return;
-        }
         try {
+            if (!newSubject.trim()) {
+                alert("과목 이름을 입력해주세요.");
+                return;
+            }
+
+            const subjectExists = subjects.some(subject => subject.name.toLowerCase() === newSubject.trim().toLowerCase());
+            if (subjectExists) {
+                alert("이미 존재하는 과목입니다.");
+                return;
+            }
+
             if (newSubject && currentDateKey) {
                 const addedSubject = await addSubject(memberId, newSubject, currentDateKey);
-                const updatedDateTasks = {...dateTasks};
+                const updatedDateTasks = { ...dateTasks };
                 updatedDateTasks[currentDateKey] = {
                     subjects: {
                         ...updatedDateTasks[currentDateKey]?.subjects,
-                        [newSubject]: {subjectId: addedSubject.id, tasks: []},
+                        [newSubject]: { subjectId: addedSubject.id, tasks: [] },
                     },
                 };
                 setDateTasks(updatedDateTasks);
-                setNewSubject("");  // 입력 필드 값 초기화
+                setNewSubject(""); // 입력 필드 값 초기화
             }
         } catch (error) {
             console.error('Failed to add new subject:', error);
@@ -194,8 +194,11 @@ function CalendarPlan() {
     // 새 과제 추가 처리 함수
     const addNewTask = async () => {
         try {
-            if (newTask && currentDateKey && currentSubject && dateTasks[currentDateKey]?.subjects[currentSubject]) {
-                const subjectId = dateTasks[currentDateKey].subjects[currentSubject].subjectId;
+            if (newTask && currentDateKey && currentSubject !== null && Object.keys(dateTasks[currentDateKey]?.subjects).length > 0) {
+                // 현재 선택된 과목의 이름을 가져오기
+                const subjectNames = Object.keys(dateTasks[currentDateKey].subjects);
+                const selectedSubjectName = subjectNames[currentSubject];
+                const subjectId = dateTasks[currentDateKey].subjects[selectedSubjectName].subjectId;
 
                 // Subject 에 Task 추가 API 호출
                 const hoursToComplete = parseInt(hours) * 60 + parseInt(minutes);
@@ -204,12 +207,12 @@ function CalendarPlan() {
                 // 과제 추가 후 업데이트된 tasks 배열 생성
                 const updatedTasks = await getTasksBySubjectId(subjectId);
 
-                const updatedDateTasks = {...dateTasks};
+                const updatedDateTasks = { ...dateTasks };
                 updatedDateTasks[currentDateKey] = {
                     subjects: {
                         ...updatedDateTasks[currentDateKey].subjects,
-                        [currentSubject]: {
-                            ...updatedDateTasks[currentDateKey].subjects[currentSubject],
+                        [selectedSubjectName]: {
+                            ...updatedDateTasks[currentDateKey].subjects[selectedSubjectName],
                             tasks: updatedTasks
                         },
                     },
@@ -218,6 +221,8 @@ function CalendarPlan() {
                 setNewTask(""); // 과제 입력 필드 초기화
                 setHours("");   // 시간 입력 필드 초기화
                 setMinutes(""); // 분 입력 필드 초기화
+            } else {
+                alert("과목을 선택해주세요.");
             }
         } catch (error) {
             console.error("과제 추가 오류:", error);
@@ -288,7 +293,6 @@ function CalendarPlan() {
         }
     };
 
-
     return (
         <div className="calendar-plan-page">
             <div className="container">
@@ -321,15 +325,21 @@ function CalendarPlan() {
                     </div>
                     <div className="task">
                         <h3>과제</h3>
-                        <select onChange={(e) => setCurrentSubject(parseInt(e.target.value))}
-                                value={currentSubject || ''}>
+                        <select
+                            onChange={(e) => setCurrentSubject(e.target.value === '' ? null : parseInt(e.target.value))}
+                            value={currentSubject === null ? '' : currentSubject}
+                        >
                             <option value="">과목 선택</option>
-                            {subjects.map(subject => (
-                                <option key={subject.id} value={subject.id}>{subject.name}</option>
-                            ))}
+                            {currentDateKey &&
+                                Object.keys(dateTasks[currentDateKey]?.subjects || {}).map((subjectName, index) => (
+                                    <option key={index} value={index}>
+                                        {subjectName}
+                                    </option>
+                                ))}
                         </select>
+
                         <input value={newTask} onChange={(e) => setNewTask(e.target.value)} placeholder="새 과제"/>
-                        <button onClick={addNewTask} disabled={!currentSubject}>과제 추가</button>
+                        <button onClick={addNewTask} disabled={currentSubject === null || newTask.trim() === ''}>과제 추가</button>
                         <input type="number" value={hours} onChange={(e) => setHours(e.target.value)} placeholder="시간"/>
                         <input type="number" value={minutes} onChange={(e) => setMinutes(e.target.value)}
                                placeholder="분"/>
@@ -343,7 +353,7 @@ function CalendarPlan() {
                                 <button onClick={() => handleDeleteSubject(subjectData.subjectId)}>과목 삭제</button>
                             </h3>
                             <ul>
-                            {subjectData.tasks.map((task, index) => (
+                                {subjectData.tasks.map((task, index) => (
                                     <li key={index}>
                                         {task.name}
                                         <button onClick={() => handleDeleteTask(task.id)}>과제 삭제</button>

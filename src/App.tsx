@@ -7,7 +7,7 @@ import NavBar from "./component/NavBar";
 import CalendarPage from "./pages/CalendarPage";
 import CalendarPlan from "./pages/CalendarPlan";
 import CalendarShow from "./pages/CalendarShow";
-import {Dashboard} from "./pages/Dashboard";
+import Dashboard from "./pages/Dashboard";
 import {StudyGroup} from "./pages/StudyGroup";
 import {MyPage} from "./pages/MyPage";
 import {Record} from "./pages/Record";

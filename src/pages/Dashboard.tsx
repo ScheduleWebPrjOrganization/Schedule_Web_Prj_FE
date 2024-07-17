@@ -2,52 +2,52 @@ import React, { useState, useEffect } from "react";
 import "../style/Dashboard.css";
 import axios from "axios";
 import dayjs from "dayjs";
-import {Task, Subject, DateTasks} from "./CalendarPlan"; // CalendarPlan에서 Subject와 Task 인터페이스 임포트
+import { Task, Subject, DateTasks } from "./CalendarPlan"; // CalendarPlan에서 Subject와 Task 인터페이스 임포트
 
 const API_URL = 'http://localhost:8080/api';
 
 function Dashboard() {
     const [currentDate, setCurrentDate] = useState(new Date());
-    const [subjects, setSubjects] = useState<Subject[]>([]);
     const [dateTasks, setDateTasks] = useState<DateTasks>({});
 
-    // 이전 날짜로 이동하는 함수
+    // 이전 날짜로 이동
     const goToPreviousDate = () => {
-        const previousDate = new Date(currentDate);
-        previousDate.setDate(currentDate.getDate() - 1);
-        setCurrentDate(previousDate);
+        const previousDate = dayjs(currentDate).subtract(1, 'day');
+        setCurrentDate(previousDate.toDate());
     };
 
-    // 다음 날짜로 이동하는 함수
+    // 다음 날짜로 이동
     const goToNextDate = () => {
-        const nextDate = new Date(currentDate);
-        nextDate.setDate(currentDate.getDate() + 1);
-        setCurrentDate(nextDate);
+        const nextDate = dayjs(currentDate).add(1, 'day');
+        setCurrentDate(nextDate.toDate());
     };
 
-    // 컴포넌트가 마운트되거나 currentDate가 변경될 때 데이터를 불러오기
     useEffect(() => {
         fetchSubjectsAndTasks();
     }, [currentDate]);
 
-    // 과목과 과제 데이터를 가져오는 함수
+    // API를 통해 과목 및 과제 가져오기
     const fetchSubjectsAndTasks = async () => {
         try {
             const dateKey = dayjs(currentDate).format("YYYY-MM-DD");
-            const responseSubjects = await axios.get<Subject[]>(`${API_URL}/subjects/members/1`); // memberId는 임시로 1로 설정
+            const memberId = 1; // 임시로 멤버 ID를 1로 설정
+
+            // API 요청 보내기
+            const response = await axios.get<{ subjects: Subject[], tasks: Task[] }>(`${API_URL}/tasks/members/${memberId}/tasks?date=${dateKey}`);
+            const subjects = response.data.subjects;
+            const tasks = response.data.tasks;
 
             const initialDateTasks: DateTasks = {};
             initialDateTasks[dateKey] = { subjects: {} };
 
-            for (const subject of responseSubjects.data) {
-                const responseTasks = await axios.get<Task[]>(`${API_URL}/subjects/${subject.id}/tasks`);
+            // 과목 및 해당 과제 설정
+            for (const subject of subjects) {
                 initialDateTasks[dateKey].subjects[subject.name] = {
                     subjectId: subject.id,
-                    tasks: responseTasks.data,
+                    tasks: tasks.filter(task => task.subject_id === subject.id),
                 };
             }
 
-            setSubjects(responseSubjects.data);
             setDateTasks(initialDateTasks);
         } catch (error) {
             console.error("과목 및 과제 불러오기 오류:", error);
@@ -85,7 +85,7 @@ function Dashboard() {
                 </div>
             </div>
         </div>
-    )
+    );
 }
 
-export { Dashboard };
+export default Dashboard;
