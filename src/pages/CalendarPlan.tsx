@@ -9,19 +9,19 @@ interface Range {
     endDate: string;
 }
 
-interface Subject {
+export interface Subject {
     id: number;
     name: string;
 }
 
-interface Task {
+export interface Task {
     id: number;
     name: string;
     status: string;
     hoursToComplete: number;
 }
 
-interface DateTasks {
+export interface DateTasks {
     [date: string]: {
         subjects: { [subject: string]: { subjectId: number, tasks: Task[] } };
     };
@@ -39,31 +39,32 @@ async function getTasksBySubjectId(subjectId: number): Promise<Task[]> {
     return response.data;
 }
 
-async function addSubject(memberId: number, subjectName: string): Promise<Subject> {
-    const response = await axios.post<Subject>(`${API_URL}/subjects/members/${memberId}`, {
-        name: subjectName
+async function addSubject(memberId: number, subjectName: string, dateKey: string): Promise<Subject> {
+    const response = await axios.post<Subject>(`${API_URL}/subjects/members/${memberId}`, null, {
+        params: {
+            subjectName: subjectName,
+            dateKey: dateKey
+        }
     });
-    console.log('과목 추가 성공:',response.data);
+    console.log('과목 추가 성공:', response.data);
 
     return response.data;
 }
 
-async function addTaskToSubject(subjectId: number, taskName: string): Promise<void> {
+async function addTaskToSubject(subjectId: number, taskName: string, dateKey: string): Promise<void> {
     try {
-        if (!subjectId || !taskName) {
-            console.error("추가 에러");
-            return;
-        }
         const response = await axios.post(`${API_URL}/subjects/${subjectId}/tasks`, {
             name: taskName,
             status: "NOT_DONE", // 기본 상태 설정
-            hoursToComplete: 1 // 기본 시간 설정 (필요시 수정)
+            hoursToComplete: 1, // 기본 시간 설정(???)
+            dateKey: dateKey
         });
         console.log("Task 추가 성공:", response.data);
     } catch (error) {
-        console.error("Task 오류:", error);
+        console.error("Task 추가 오류:", error);
     }
 }
+
 
 async function deleteSubject(subjectId: number): Promise<void> {
     try {
@@ -97,7 +98,8 @@ function CalendarPlan() {
     const [newTask, setNewTask] = useState(""); // 새 과제 입력 상태
     const [currentSubject, setCurrentSubject] = useState<string | null>(null); // 현재 선택된 과목 상태
     const [newDayInput, setNewDayInput] = useState<string>(""); // 새 중요 일정 입력 상태
-    const [memberId, setMemberId] = useState<number>(1); // memberId 임의의 값 넣음 실제로는 로그인꺼 사용
+    // memberId 임의의 값 넣음 실제로는 로그인꺼 사용
+    const [memberId, setMemberId] = useState<number>(1);
 
     // 날짜 범위와 newDay 변경 시 useEffect로 실행
     useEffect(() => {
@@ -151,8 +153,7 @@ function CalendarPlan() {
     const addNewSubject = async () => {
         try {
             if (newSubject && currentDateKey) {
-                // 과목 추가 API 호출
-                const addedSubject = await addSubject(memberId, newSubject);
+                const addedSubject = await addSubject(memberId, newSubject, currentDateKey);
                 const updatedDateTasks = {...dateTasks};
                 updatedDateTasks[currentDateKey] = {
                     subjects: {
@@ -168,6 +169,7 @@ function CalendarPlan() {
         }
     };
 
+
     // 새 과제 추가 처리 함수
     const addNewTask = async () => {
         try {
@@ -175,7 +177,7 @@ function CalendarPlan() {
                 const subjectId = dateTasks[currentDateKey].subjects[currentSubject].subjectId;
 
                 // Subject에 Task 추가 API 호출
-                await addTaskToSubject(subjectId, newTask);
+                await addTaskToSubject(subjectId, newTask, currentDateKey);
 
                 // 과제 추가 후 업데이트된 tasks 배열 생성
                 const updatedTasks = await getTasksBySubjectId(subjectId);
@@ -199,7 +201,6 @@ function CalendarPlan() {
     };
 
     // 과목 삭제
-    // 과목 삭제 처리 함수
     const handleDeleteSubject = async (subjectId: number) => {
         try {
             await deleteSubject(subjectId); // 과목 삭제 API 호출
@@ -312,16 +313,17 @@ function CalendarPlan() {
                     dateTasks[currentDateKey] &&
                     Object.entries(dateTasks[currentDateKey].subjects).map(([subject, subjectData]) => (
                         <div className="day-plan" key={subject}>
-                            <h3>{subject}</h3>
+                            <h3>{subject}
+                                <button onClick={() => handleDeleteSubject(subjectData.subjectId)}>과목 삭제</button>
+                            </h3>
                             <ul>
-                                {subjectData.tasks.map((task, index) => (
+                            {subjectData.tasks.map((task, index) => (
                                     <li key={index}>
                                         {task.name}
                                         <button onClick={() => handleDeleteTask(task.id)}>과제 삭제</button>
                                     </li>
                                 ))}
                             </ul>
-                            <button onClick={() => handleDeleteSubject(subjectData.subjectId)}>과목 삭제</button>
                         </div>
                     ))}
             </div>
