@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import {Simulate} from "react-dom/test-utils";
 import StudyGroupBox from "./StudyGroupBox";
+import './AllStudyGroup.css';
 
 
 interface Member {
@@ -33,7 +34,7 @@ const AllStudyGroup = () => {
 
 
     return (
-        <div>
+        <div className="study-group-container">
             {studyGroups.map((studyGroup) => (
                 <StudyGroupBox key={studyGroup.id} {...studyGroup} />
             ))}
