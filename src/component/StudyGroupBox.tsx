@@ -2,6 +2,7 @@ import AllStudyGroup from "./AllStudyGroup";
 import axios from "axios";
 import React, {useEffect, useState} from "react";
 import './StudyGroupBox.css';
+import StudyGroupLoading from "./StudyGroupLoading";
 
 interface StudyGroupBoxProps {
     id: number;
@@ -39,7 +40,11 @@ const StudyGroupBox: React.FC<StudyGroupBoxProps> = ({ id }) => {
     }, [id]);
 
     if (isLoading) {
-        return <div>Loading...</div>;
+        return (
+            <div>
+                <StudyGroupLoading></StudyGroupLoading>
+            </div>
+        )
     }
 
     return (<div className="container noselect">
