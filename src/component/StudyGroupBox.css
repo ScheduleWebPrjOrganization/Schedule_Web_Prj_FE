@@ -12,8 +12,6 @@
     height: 245px;
 }
 
-
-
 #card_1 {
     position: absolute;
     inset: 0;
@@ -643,3 +641,4 @@
     /* Non-prefixed version, currently
                                      supported by Chrome, Edge, Opera and Firefox */
 }
+

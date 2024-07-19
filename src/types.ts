@@ -1,4 +1,3 @@
-
 export interface Member {
     id: number;
     email: string;
@@ -11,6 +10,6 @@ export interface StudyGroup {
     memberCount: number;
     description: string;
     name: string;
-    created_at: string;
+    createdAt: string;
     members: Member[];
 };
