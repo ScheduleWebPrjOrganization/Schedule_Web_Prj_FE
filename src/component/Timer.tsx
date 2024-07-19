@@ -5,18 +5,29 @@ import '../Timer.css';
 // TimerProps 인터페이스는 현재 비어 있지만, 필요한 경우 타이머 컴포넌트에 전달할 프로퍼티를 정의하는 데 사용할 수 있습니다.
 interface TimerProps {}
 
+// Subject 인터페이스 정의
+interface Subject {
+    id: number;
+    name: string;
+}
+
 // Timer 컴포넌트 정의
 const Timer: React.FC<TimerProps> = () => {
     // 타이머의 현재 시간을 문자열로 저장하는 상태
     // const [time, setTime] = useState<string>('00:00:00');
-    const [seconds, setSeconds] = useState<number>(0);// 초를 저장하는 상태
+    // 초를 저장하는 상태
+    const [seconds, setSeconds] = useState<number>(0);
 
     // 타이머가 실행 중인지 여부를 나타내는 불리언 상태
     const [timerRunning, setTimerRunning] = useState<boolean>(false);
-
-    const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null); // setInterval ID를 저장
-
-    const [lastStoppedTime, setLastStoppedTime] = useState<string>('00:00:00');  // 마지막으로 정지된 시간을 저장하는 상태
+    // setInterval ID를 저장
+    const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
+    // 마지막으로 정지된 시간을 저장하는 상태
+    const [lastStoppedTime, setLastStoppedTime] = useState<string>('00:00:00');
+    // 모든 Subject 목록을 저장하는 상태
+    const [subjects, setSubjects] = useState<Subject[]>([]);
+    // 선택된 Subject의 ID를 저장하는 상태
+    const [selectedSubjectId, setSelectedSubjectId] = useState<number | null>(null);
     // 시간을 시:분:초 형식으로 변환하는 함수
     const formatTime = (totalSeconds: number): string => {
         const hours = Math.floor(totalSeconds / 3600);
@@ -28,10 +39,28 @@ const Timer: React.FC<TimerProps> = () => {
     // 서버 API의 기본 URL
     const apiUrl: string = '/api/timer';
 
+    // 모든 Subject를 불러오는 함수
+    const fetchSubjects = async () => {
+        try {
+            const response = await axios.get('/api/subjects');
+            // 서버 응답이 배열인지 확인하고, 그렇지 않은 경우 비어 있는 배열을 사용
+            // const subjectsData = Array.isArray(response.data) ? response.data : [];
+            setSubjects(response.data);
+        } catch (error) {
+            console.error('Error fetching subjects:', error);
+        }
+    };
     // 타이머 시작 함수
     const startTimer = async (): Promise<void> => {
+        // Subject가 선택되지 않았을 경우 알림
+        if (selectedSubjectId === null) {
+            alert('Please select a subject first');
+            return;
+        }
+
         try {
-            await axios.get(`${apiUrl}/start`);
+            await axios.get(`${apiUrl}/start`, { params: { subject_id: selectedSubjectId } });
+            // 타이머가 실행 중이지 않을 경우 setInterval 설정
             if (!intervalId) {
                 const newIntervalId = setInterval(() => {
                     setSeconds(prevSeconds => prevSeconds + 1);
@@ -75,8 +104,13 @@ const Timer: React.FC<TimerProps> = () => {
 
     // 타이머 정지 및 현재 시간 표시 함수
     const stopTimer = async (): Promise<void> => {
+        // Subject가 선택되지 않았을 경우 알림
+        if (selectedSubjectId === null) {
+            alert('Please select a subject first');
+            return;
+        }
         try {
-            await axios.get(`${apiUrl}/stop`);
+            await axios.get(`${apiUrl}/stop`, { params: { subject_id: selectedSubjectId } });
             if (intervalId) clearInterval(intervalId);
             setIntervalId(null);
             setLastStoppedTime(formatTime(seconds)); // 시간 초기화 전 정지된 시간 업데이트
@@ -89,6 +123,11 @@ const Timer: React.FC<TimerProps> = () => {
         }
     };
 
+    // 컴포넌트가 마운트될 때 모든 Subject를 불러오기
+    useEffect(() => {
+        fetchSubjects();
+    }, []);
+
     // 컴포넌트가 언마운트 될 때 인터벌 정리
     useEffect(() => {
         return () => {
@@ -98,8 +137,27 @@ const Timer: React.FC<TimerProps> = () => {
 
     return (
         <div className="timer-container">
+            {/* 과목 선택 드롭다운 */}
+            <div className="subject-selector">
+                <label htmlFor="subject-select">과목 선택: </label>
+                <select
+                    id="subject-select"
+                    value={selectedSubjectId ?? ''}
+                    onChange={(e) => setSelectedSubjectId(Number(e.target.value))}
+                >
+                    <option value="" disabled>과목을 선택하세요</option>
+                    {/*{Array.isArray(subjects) && subjects.map((subject) => (*/}
+                    {/*    <option key={subject.id} value={subject.id}>{subject.name}</option>*/}
+                    {/*))}*/}
+                    {subjects.map((subject) => (
+                        <option key={subject.id} value={subject.id}>{subject.name}</option>
+                    ))}
+                </select>
+            </div>
+            {/* 타이머 디스플레이 */}
             <div className="timer-display">{formatTime(seconds)}</div>
             <div className="last-time">마지막 공부시간: {lastStoppedTime}</div>
+            {/* 타이머 컨트롤 버튼 */}
             <div className="controls">
                 <button onClick={startTimer} disabled={timerRunning}>시작</button>
                 <button onClick={pauseTimer} disabled={!timerRunning}>일시정지</button>
