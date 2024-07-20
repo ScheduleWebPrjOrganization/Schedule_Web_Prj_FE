@@ -1,0 +1,88 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    position: relative;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.modal-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.subject-tag {
+    display: inline-block;
+    background-color: #e0e0e0;
+    padding: 5px;
+    margin: 5px;
+    border-radius: 5px;
+}
+
+/* 추가된 멤버 추가 폼 관련 스타일 */
+.modal-content h2 {
+    margin-bottom: 20px;
+}
+
+.modal-content input[type="text"],
+.modal-content input[type="email"] {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.modal-content input[type="checkbox"] {
+    margin-left: 10px;
+}
+
+.modal-content label {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+}
+
+.modal-content button {
+    padding: 10px 20px;
+    margin: 10px 5px 0 0;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+}
+
+.modal-content button:hover {
+    background-color: #0056b3;
+}
+
+.modal-content .subjects {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 10px 0;
+}
+
+.modal-content .subject-tag {
+    margin: 5px 5px 0 0;
+}
