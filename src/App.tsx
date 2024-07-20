@@ -10,7 +10,6 @@ import CalendarPage from "./pages/CalendarPage";
 import CalendarPlan from "./pages/CalendarPlan";
 import CalendarShow from "./pages/CalendarShow";
 import Dashboard from "./pages/Dashboard";
-import {StudyGroup} from "./pages/StudyGroup";
 import {MyPage} from "./pages/MyPage";
 import {Record} from "./pages/Record";
 
@@ -27,7 +26,7 @@ const App: React.FC = () => {
                     <Route path="/calendar-plan" element={<CalendarPlan />} />
                     <Route path="/calendar-show" element={<CalendarShow/>} />
                     <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/studygroup" element={<StudyGroup />} />
+                    <Route path="/studygroup" element={<AllStudyGroup />} />
                     <Route path="/studygroup/:id" element={<StudyGroupDetails />} />
                     <Route path="/mypage" element={<MyPage />} />
                     <Route path="/record" element={<Record />} />
