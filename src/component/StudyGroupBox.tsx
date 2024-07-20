@@ -1,7 +1,6 @@
-import AllStudyGroup from "./AllStudyGroup";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import React, {useEffect, useState} from "react";
-import './StudyGroupBox.css';
+import Modal from "./StudyGroupCheckModal";
 import StudyGroupLoading from "./StudyGroupLoading";
 import './StudyGroupBox.css';
 import { useNavigate } from "react-router-dom";
@@ -120,4 +119,5 @@ const StudyGroupBox: React.FC<StudyGroupBoxProps> = ({ id, name, description, cr
         </div>
     );
 };
+
 export default StudyGroupBox;

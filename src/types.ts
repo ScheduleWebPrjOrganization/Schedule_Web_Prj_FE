@@ -3,7 +3,8 @@ export interface Member {
     email: string;
     studyGroups: StudyGroup[];
     online: boolean;
-};
+    subjects: string[];
+}
 
 export interface StudyGroup {
     id: number;
@@ -12,4 +13,4 @@ export interface StudyGroup {
     name: string;
     createdAt: string;
     members: Member[];
-};
+}

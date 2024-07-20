@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import {Simulate} from "react-dom/test-utils";
 import StudyGroupBox from "./StudyGroupBox";
 import './AllStudyGroup.css';
 
