@@ -28,11 +28,9 @@ const App: React.FC = () => {
                     <Route path="/calendar-show" element={<CalendarShow/>} />
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/studygroup" element={<StudyGroup />} />
+                    <Route path="/studygroup/:id" element={<StudyGroupDetails />} />
                     <Route path="/mypage" element={<MyPage />} />
                     <Route path="/record" element={<Record />} />
-
-                    <Route path="/studygroup" element={<AllStudyGroup />} />
-                    <Route path="/studygroup/:id" element={<StudyGroupDetails />} />
                 </Routes>
             </div>
         </Router>
