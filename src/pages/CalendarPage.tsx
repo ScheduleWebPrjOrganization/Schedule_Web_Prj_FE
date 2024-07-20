@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import Calendar from "react-calendar";
 import 'react-calendar/dist/Calendar.css';
 import dayjs from 'dayjs';
-import '../style/Calendar.css'
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import '../style/Calendar.css';
+import { Link, useNavigate } from "react-router-dom";
 
 function CalendarPage() {
     const [selectedRanges, setSelectedRanges] = useState<{ startDate: Date | null, endDate: Date | null }[]>([]);
@@ -12,10 +12,16 @@ function CalendarPage() {
     const handleRangeChange = (dates: any) => {
         if (Array.isArray(dates)) {
             const [start, end] = dates;
-            setSelectedRanges([...selectedRanges, { startDate: start, endDate: end }]);
+            if (start && end) {
+                setSelectedRanges([...selectedRanges, { startDate: start, endDate: end }]);
+            }
         } else {
             setSelectedRanges([...selectedRanges, { startDate: dates, endDate: null }]);
         }
+    };
+
+    const handleClearSelection = () => {
+        setSelectedRanges([]);
     };
 
     const PlanButtonClick = () => {
@@ -59,16 +65,25 @@ function CalendarPage() {
 
             <div>
                 <p>선택한 날짜 범위: </p>
-                {selectedRanges.map((range, index) => (
-                    <p key={index}>
-                        {range.startDate?.toLocaleDateString()} - {range.endDate?.toLocaleDateString() || '진행 중'}
-                    </p>
-                ))}
+                {selectedRanges.length > 0 ? (
+                    selectedRanges.map((range, index) => (
+                        <p key={index}>
+                            {range.startDate?.toLocaleDateString()} - {range.endDate?.toLocaleDateString() || '진행 중'}
+                        </p>
+                    ))
+                ) : (
+                    <p>선택된 날짜 범위가 없습니다.</p>
+                )}
             </div>
 
-            <button className="plan-button" onClick={PlanButtonClick} disabled={selectedRanges.length === 0}>
-                계획 짜기
-            </button>
+            <div className="button-group">
+                <button className="plan-button" onClick={PlanButtonClick} disabled={selectedRanges.length === 0}>
+                    계획 짜기
+                </button>
+                <button className="clear-button" onClick={handleClearSelection} disabled={selectedRanges.length === 0}>
+                    선택 초기화
+                </button>
+            </div>
         </div>
     );
 }
