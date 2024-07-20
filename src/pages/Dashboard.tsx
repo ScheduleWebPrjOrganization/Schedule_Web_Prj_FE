@@ -3,6 +3,7 @@ import "../style/Dashboard.css";
 import axios from "axios";
 import dayjs from "dayjs";
 import { Task, DateTasks } from "./CalendarPlan"; // CalendarPlan에서 Task와 DateTasks 인터페이스 임포트
+import Timer from "../component/Timer"
 
 const API_URL = 'http://localhost:8080/api';
 
@@ -26,7 +27,6 @@ function Dashboard() {
         fetchSubjectsAndTasks();
     }, [currentDate]);
 
-    // API를 통해 과목 및 과제 가져오기
     // API를 통해 과목 및 과제 가져오기
     const fetchSubjectsAndTasks = async () => {
         try {
@@ -99,9 +99,7 @@ function Dashboard() {
 
     return (
         <div className="dashboard">
-            <div className="small-container">
-                <p>00 : 00 : 00</p>
-            </div>
+            <Timer />
             <div className="large-container">
                 <div className="top-bar">
                     <div className="arrow left-arrow" onClick={goToPreviousDate}>{"<<"}</div>

@@ -23,7 +23,6 @@ const App: React.FC = () => {
                     <Route path="/" element={<Login />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/home" element={<Home />} />
-                    <Route path="/api/timer" element={<Timer />} />
                     <Route path="/calendar" element={<CalendarPage />} />
                     <Route path="/calendar-plan" element={<CalendarPlan />} />
                     <Route path="/calendar-show" element={<CalendarShow/>} />
