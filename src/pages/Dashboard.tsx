@@ -3,6 +3,7 @@ import "../style/Dashboard.css";
 import axios from "axios";
 import dayjs from "dayjs";
 import { Task, Subject, DateTasks } from "./CalendarPlan"; // CalendarPlan에서 Subject와 Task 인터페이스 임포트
+import Timer from "../component/Timer"
 
 const API_URL = 'http://localhost:8080/api';
 
@@ -56,9 +57,7 @@ function Dashboard() {
 
     return (
         <div className="dashboard">
-            <div className="small-container">
-                <p>00 : 00 : 00</p>
-            </div>
+            <Timer />
             <div className="large-container">
                 <div className="top-bar">
                     <div className="arrow left-arrow" onClick={goToPreviousDate}>{"<<"}</div>
