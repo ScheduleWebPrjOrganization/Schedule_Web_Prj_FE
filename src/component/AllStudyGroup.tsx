@@ -24,7 +24,7 @@ const AllStudyGroup = () => {
     const [studyGroups, setStudyGroups] = useState<StudyGroup[]>([]);
 
     useEffect(() => {
-        axios.get('http://localhost:8080/studygroup')
+        axios.get('http://localhost:8080/api/studygroup')
             .then(response => {
                 if (Array.isArray(response.data)) {
                     setStudyGroups(response.data);

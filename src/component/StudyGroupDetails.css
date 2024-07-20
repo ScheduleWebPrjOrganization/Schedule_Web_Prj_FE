@@ -93,6 +93,13 @@
     margin-top: 5px;
 }
 
+/* 멤버 공부 시간 스타일 */
+.study-group-details li p.study-time {
+    font-size: 0.9rem;
+    color: #444;
+    margin-top: 5px;
+}
+
 /* Hex Brick Animation (기존 스타일 참고) */
 .hex-brick {
     background: #000000;

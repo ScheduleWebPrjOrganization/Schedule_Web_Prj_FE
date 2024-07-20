@@ -10,7 +10,7 @@ const StudyGroupDetails: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        axios.get(`http://localhost:8080/studygroup/id/${id}`)
+        axios.get(`http://localhost:8080/api/studygroup/id/${id}`)
             .then(response => {
                 setStudyGroup(response.data);
                 setIsLoading(false);
@@ -41,7 +41,7 @@ const StudyGroupDetails: React.FC = () => {
                     <li key={member.id}>
                         <p>이름: {member.name}</p>
                         <p className="online-status">온라인 여부: {member.online ? '온라인' : '오프라인'}</p>
-                        {member.online && (
+                        {member.online && member.subjects && (
                             <p className="subjects">공부 과목: {member.subjects.map((subject: Subject) => subject.name).join(', ')}</p>
                         )}
                     </li>

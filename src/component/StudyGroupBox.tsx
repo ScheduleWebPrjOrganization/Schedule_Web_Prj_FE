@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import Modal from "./StudyGroupCheckModal";
+import StudyGroupCheckModal from "./StudyGroupCheckModal";
 import StudyGroupLoading from "./StudyGroupLoading";
 import './StudyGroupBox.css';
 import { useNavigate } from "react-router-dom";
@@ -27,23 +27,24 @@ const StudyGroupBox: React.FC<StudyGroupBoxProps> = ({ id, name, description, cr
     const [isLoading, setIsLoading] = useState(true);
     const [targetCardID, setTargetCardID] = useState("");
     const [showModal, setShowModal] = useState(false);
-    const navigate = useNavigate(); // useNavigate 훅을 사용합니다.
+    const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get(`http://localhost:8080/studygroup/id/${id}`)
-            .then(response => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get(`http://localhost:8080/api/studygroup/id/${id}`);
                 setOnlyStudyGroup(response.data);
                 setIsLoading(false);
                 const targetCardID = id % 7;
                 const tempTargetCardID2 = "card_" + targetCardID;
                 setTargetCardID(tempTargetCardID2);
-
-                console.log(response.data); // 데이터 로딩 확인
-            })
-            .catch(error => {
+            } catch (error) {
                 console.error('There was an error fetching the study group!', error);
                 setIsLoading(false);
-            });
+            }
+        };
+
+        fetchData();
     }, [id]);
 
     if (isLoading) {
@@ -60,6 +61,19 @@ const StudyGroupBox: React.FC<StudyGroupBoxProps> = ({ id, name, description, cr
 
     const handleCloseModal = () => {
         setShowModal(false);
+    };
+
+    const handleAddMember = (member: Member) => {
+        setOnlyStudyGroup((prevGroup) => {
+            if (prevGroup) {
+                return {
+                    ...prevGroup,
+                    members: [...prevGroup.members!, member],
+                    memberCount: prevGroup.memberCount + 1
+                };
+            }
+            return prevGroup;
+        });
     };
 
     const navigateToDetails = () => {
@@ -109,13 +123,15 @@ const StudyGroupBox: React.FC<StudyGroupBoxProps> = ({ id, name, description, cr
                     </div>
                 </div>
             </div>
-            <Modal show={showModal} onClose={handleCloseModal}>
-                <h2>{onlyStudyGroup.name}</h2>
-                <p>{onlyStudyGroup.description}</p>
-                <p>생성 날짜: {onlyStudyGroup.createdAt}</p>
-                <p>멤버 수: {onlyStudyGroup.memberCount}</p>
-                <button onClick={navigateToDetails}>자세히 보기</button>
-            </Modal>
+            {showModal && (
+                <StudyGroupCheckModal onClose={handleCloseModal} onAddMember={handleAddMember} existingMembers={onlyStudyGroup.members || []} groupId={onlyStudyGroup.id}>
+                    <h2>{onlyStudyGroup.name}</h2>
+                    <p>{onlyStudyGroup.description}</p>
+                    <p>생성 날짜: {onlyStudyGroup.createdAt}</p>
+                    <p>멤버 수: {onlyStudyGroup.memberCount}</p>
+                    <button onClick={navigateToDetails}>자세히 보기</button>
+                </StudyGroupCheckModal>
+            )}
         </div>
     );
 };
