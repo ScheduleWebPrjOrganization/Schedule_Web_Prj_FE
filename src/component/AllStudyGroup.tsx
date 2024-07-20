@@ -25,7 +25,13 @@ const AllStudyGroup = () => {
 
     useEffect(() => {
         axios.get('http://localhost:8080/studygroup')
-            .then(response => setStudyGroups(response.data))
+            .then(response => {
+                if (Array.isArray(response.data)) {
+                    setStudyGroups(response.data);
+                } else {
+                    console.error('Response data is not an array:', response.data);
+                }
+            })
             .catch(error => console.error('There was an error fetching the study groups!', error));
     }, []);
 

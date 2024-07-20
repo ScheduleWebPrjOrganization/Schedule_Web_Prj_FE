@@ -1,9 +1,15 @@
 export interface Member {
     id: number;
+    name: string;
     email: string;
-    studyGroups: StudyGroup[];
     online: boolean;
-    subjects: string[];
+    subjects: Subject[];
+}
+
+export interface Subject {
+    id: number;
+    name: string;
+    dateKey: string;
 }
 
 export interface StudyGroup {
@@ -12,5 +18,5 @@ export interface StudyGroup {
     description: string;
     name: string;
     createdAt: string;
-    members: Member[];
+    members?: Member[];
 }
