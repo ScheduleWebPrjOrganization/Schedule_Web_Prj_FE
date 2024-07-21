@@ -3,7 +3,9 @@ import axios from '../config/AxiosConfig';
 import '../Timer.css';
 
 // TimerProps 인터페이스는 현재 비어 있지만, 필요한 경우 타이머 컴포넌트에 전달할 프로퍼티를 정의하는 데 사용할 수 있습니다.
-interface TimerProps {}
+interface TimerProps {
+    subjects?: Subject[];  // subjects는 선택적으로 받도록 하고 기본값을 빈 배열로 설정할 수 있습니다.
+}
 
 // Subject 인터페이스 정의
 interface Subject {
@@ -36,18 +38,18 @@ const Timer: React.FC<TimerProps> = () => {
         return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     };
 
-    // 서버 API의 기본 URL
+    // 서버 API 의 기본 URL
     const apiUrl: string = '/api/timer';
 
-    // 모든 Subject를 불러오는 함수
+    // 모든 Subject 를 불러오는 함수
     const fetchSubjects = async () => {
         try {
             const response = await axios.get('/api/subjects');
-            // 서버 응답이 배열인지 확인하고, 그렇지 않은 경우 비어 있는 배열을 사용
-            // const subjectsData = Array.isArray(response.data) ? response.data : [];
-            setSubjects(response.data);
+            const subjectsData = Array.isArray(response.data) ? response.data : [];  // 수정: 배열 확인 로직 추가
+            setSubjects(subjectsData);
         } catch (error) {
             console.error('Error fetching subjects:', error);
+            setSubjects([]);  // 에러 발생 시 빈 배열로 설정
         }
     };
     // 타이머 시작 함수

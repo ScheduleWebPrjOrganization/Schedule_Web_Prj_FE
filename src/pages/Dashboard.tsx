@@ -56,7 +56,6 @@ function Dashboard() {
                     };
                 }
 
-                // 과제 추가
                 initialDateTasks[dateKey].subjects[subjectName].tasks.push(task);
             });
 
