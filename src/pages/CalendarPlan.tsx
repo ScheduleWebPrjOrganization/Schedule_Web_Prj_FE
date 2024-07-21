@@ -38,16 +38,19 @@ export interface DateTasks {
 
 const API_URL = 'http://localhost:8080/api';
 
+// 과목 불러오기
 async function getSubjectsByMemberId(memberId: number): Promise<Subject[]> {
     const response = await axios.get<Subject[]>(`${API_URL}/subjects/members/${memberId}`);
     return response.data;
 }
 
+// 과제 불러오기
 async function getTasksBySubjectId(subjectId: number): Promise<Task[]> {
     const response = await axios.get<Task[]>(`${API_URL}/subjects/${subjectId}/tasks`);
     return response.data;
 }
 
+// 새로운 과목 추가하기
 async function addSubject(memberId: number, subjectName: string, dateKey: string): Promise<Subject> {
     const response = await axios.post<Subject>(`${API_URL}/subjects/members/${memberId}`, null, {
         params: {
@@ -58,19 +61,30 @@ async function addSubject(memberId: number, subjectName: string, dateKey: string
     return response.data;
 }
 
+// 새로운 과제 추가하기
 async function addTaskToSubject(subjectId: number, taskName: string, dateKey: string, plannedTime: number): Promise<void> {
-    await axios.post(`${API_URL}/subjects/${subjectId}/tasks`, {
+    const taskData = {
         name: taskName,
         status: "NOT_DONE",
         hoursToComplete: plannedTime,
         dateKey: dateKey
+    };
+
+    console.log("Sending Task Data:", taskData); // 디버깅 로그 추가
+
+    await axios.post(`${API_URL}/subjects/${subjectId}/tasks`, taskData, {
+        headers: {
+            'Content-Type': 'application/json'
+        }
     });
 }
 
+// 과목 삭제하기
 async function deleteSubject(subjectId: number): Promise<void> {
     await axios.delete(`${API_URL}/subjects/${subjectId}`);
 }
 
+// 과제 삭제하기
 async function deleteTask(taskId: number): Promise<void> {
     await axios.delete(`${API_URL}/subjects/tasks/${taskId}`);
 }
