@@ -101,14 +101,16 @@ function Dashboard() {
                     <div className="current-date">{dayjs(currentDate).format("YYYY-MM-DD")}</div>
                     <div className="arrow right-arrow" onClick={goToNextDate}>{">>"}</div>
                 </div>
-                <div className="subject-task">
+                <div className="subjects-container">
                     {dateTasks[dayjs(currentDate).format("YYYY-MM-DD")] && Object.keys(dateTasks[dayjs(currentDate).format("YYYY-MM-DD")].subjects).map(subjectName => (
-                        <div key={subjectName}>
+                        <div className="subject-card" key={subjectName}>
                             <h3>{subjectName}</h3>
                             <ul>
                                 {dateTasks[dayjs(currentDate).format("YYYY-MM-DD")].subjects[subjectName].tasks.map(task => (
                                     <li key={task.id}>
-                                        {task.name}
+                                        <div>{task.name}</div>
+                                        <div>목표 시간: {task.hoursToComplete} 분</div>
+                                        <div>상태: {task.status}</div>
                                         <button onClick={() => handleDeleteTask(dayjs(currentDate).format("YYYY-MM-DD"), subjectName, task.id)}>삭제</button>
                                     </li>
                                 ))}
