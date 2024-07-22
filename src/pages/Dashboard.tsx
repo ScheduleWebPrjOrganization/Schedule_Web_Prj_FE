@@ -8,37 +8,31 @@ import Timer from "../component/Timer";
 const API_URL = 'http://localhost:8080/api';
 
 function Dashboard() {
-    const [currentDate, setCurrentDate] = useState(new Date());
+    const [currentDate, setCurrentDate] = useState<Date>(new Date());
     const [dateTasks, setDateTasks] = useState<DateTasks>({});
 
-    // 이전 날짜로 이동
     const goToPreviousDate = () => {
         const previousDate = dayjs(currentDate).subtract(1, 'day');
         setCurrentDate(previousDate.toDate());
     };
 
-    // 다음 날짜로 이동
     const goToNextDate = () => {
         const nextDate = dayjs(currentDate).add(1, 'day');
         setCurrentDate(nextDate.toDate());
     };
 
-    // 날짜 변경 시 과목 및 과제 가져오기
     useEffect(() => {
         fetchSubjectsAndTasks();
     }, [currentDate]);
 
-    // API를 통해 과목 및 과제 가져오기
     const fetchSubjectsAndTasks = async () => {
         try {
             const dateKey = dayjs(currentDate).format("YYYY-MM-DD");
-            const memberId = 1; // 임시로 멤버 ID를 1로 설정
+            const memberId = 1;
 
-            // API 요청 보내기
             const response = await axios.get<Task[]>(`${API_URL}/tasks/members/${memberId}/date/${dateKey}`);
             const tasks: Task[] = response.data;
 
-            // 과목 및 해당 과제 설정
             const initialDateTasks: DateTasks = {};
 
             tasks.forEach((task: Task) => {
@@ -56,12 +50,8 @@ function Dashboard() {
                     };
                 }
 
-                // 과제 추가
                 initialDateTasks[dateKey].subjects[subjectName].tasks.push(task);
             });
-
-            console.log('Fetched tasks:', tasks);
-            console.log('Initial DateTasks:', initialDateTasks);
 
             setDateTasks(initialDateTasks);
         } catch (error) {
@@ -69,7 +59,6 @@ function Dashboard() {
         }
     };
 
-    // 과제 삭제 핸들러
     const handleDeleteTask = async (dateKey: string, subjectName: string, taskId: number) => {
         try {
             await axios.delete(`${API_URL}/tasks/${taskId}`);
@@ -96,30 +85,33 @@ function Dashboard() {
         }
     };
 
+    const subjects = dateTasks[dayjs(currentDate).format("YYYY-MM-DD")]
+        ? Object.keys(dateTasks[dayjs(currentDate).format("YYYY-MM-DD")].subjects).map(subjectName => ({
+            id: dateTasks[dayjs(currentDate).format("YYYY-MM-DD")].subjects[subjectName].subjectId,
+            name: subjectName
+        }))
+        : [];
+
     return (
         <div className="dashboard">
-            <Timer />
+            <Timer subjects={subjects} />
             <div className="large-container">
                 <div className="top-bar">
                     <div className="arrow left-arrow" onClick={goToPreviousDate}>{"<<"}</div>
                     <div className="current-date">{dayjs(currentDate).format("YYYY-MM-DD")}</div>
                     <div className="arrow right-arrow" onClick={goToNextDate}>{">>"}</div>
                 </div>
-                <div className="subject-task">
-                    {Object.keys(dateTasks).map(dateKey => (
-                        <div className="date-tasks" key={dateKey}>
+                <div className="subjects-container">
+                    {dateTasks[dayjs(currentDate).format("YYYY-MM-DD")] && Object.keys(dateTasks[dayjs(currentDate).format("YYYY-MM-DD")].subjects).map(subjectName => (
+                        <div className="subject-card" key={subjectName}>
+                            <h3>{subjectName}</h3>
                             <ul>
-                                {Object.entries(dateTasks[dateKey].subjects).map(([subjectName, subjectData]) => (
-                                    <li key={subjectData.subjectId}>
-                                        <h3>{subjectName}</h3>
-                                        <ul>
-                                            {subjectData.tasks.map(task => (
-                                                <li key={task.id}>
-                                                    {task.name}
-                                                    <button onClick={() => handleDeleteTask(dateKey, subjectName, task.id)}>삭제</button>
-                                                </li>
-                                            ))}
-                                        </ul>
+                                {dateTasks[dayjs(currentDate).format("YYYY-MM-DD")].subjects[subjectName].tasks.map(task => (
+                                    <li key={task.id}>
+                                        <div>{task.name}</div>
+                                        <div>목표 시간: {task.hoursToComplete} 분</div>
+                                        <div>상태: {task.status}</div>
+                                        <button onClick={() => handleDeleteTask(dayjs(currentDate).format("YYYY-MM-DD"), subjectName, task.id)}>삭제</button>
                                     </li>
                                 ))}
                             </ul>

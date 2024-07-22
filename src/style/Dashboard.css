@@ -46,24 +46,37 @@
     margin: 0 20px;
 }
 
-.subject-task {
+.subjects-container {
     display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 20px;
 }
 
-.subject,
-.task {
-    flex: 1;
-    padding: 20px;
-    margin: 0 10px;
-    background-color: #f0f0f0;
-    border: 1px solid #ccc;
+.subject-card {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    padding: 10px;
+    width: 30%;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
-.subject h3,
-.task h3 {
-    margin: 0;
-    font-size: 18px;
-    color: #333;
+.subject-card h3 {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.subject-card ul {
+    list-style: none;
+    padding: 0;
+}
+
+.subject-card li {
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    padding: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
