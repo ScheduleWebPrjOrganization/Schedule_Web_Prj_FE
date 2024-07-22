@@ -75,6 +75,10 @@ async function deleteTask(taskId: number): Promise<void> {
     await axios.delete(`${API_URL}/subjects/tasks/${taskId}`);
 }
 
+async function deleteTasksByName(taskName: string): Promise<void> {
+    await axios.delete(`${API_URL}/tasks/name/${encodeURIComponent(taskName)}`);
+}
+
 function CalendarPlan() {
     const location = useLocation();
     const { selectedRanges, newDay } = location.state || {};
@@ -237,25 +241,31 @@ function CalendarPlan() {
         }
     };
 
-    const handleDeleteTask = async (taskId: number) => {
+    const handleDeleteTask = async (taskName: string) => {
         try {
-            await deleteTask(taskId);
+            await deleteTasksByName(taskName);
 
-            const updatedDateTasks = { ...dateTasks };
-            for (const dateKey in updatedDateTasks) {
-                const subjects = updatedDateTasks[dateKey].subjects;
-                for (const subjectName in subjects) {
-                    const subject = subjects[subjectName];
-                    subject.tasks = subject.tasks.filter(task => task.id !== taskId);
+            // 과제 삭제
+            setDateTasks(prevDateTasks => {
+                const updatedDateTasks = { ...prevDateTasks };
+
+                for (const dateKey in updatedDateTasks) {
+                    const subjects = updatedDateTasks[dateKey].subjects;
+
+                    for (const subjectName in subjects) {
+                        const subject = subjects[subjectName];
+                        subject.tasks = subject.tasks.filter(task => task.name !== taskName);
+                    }
                 }
-            }
-
-            setDateTasks(updatedDateTasks);
+                console.log("update", updatedDateTasks);
+                return updatedDateTasks;
+            });
         } catch (error) {
             console.error("과제 삭제 오류:", error);
             alert("과제 삭제에 실패했습니다.");
         }
     };
+
 
     const handleDateChange = (index: number) => {
         setCurrentDateIndex(index);
@@ -336,8 +346,7 @@ function CalendarPlan() {
                                     <li key={index}>
                                         {taskName}
                                         <button
-                                            onClick={() => handleDeleteTask(subjectData.tasks.find(task => task.name === taskName)!.id)}>과제
-                                            삭제
+                                            onClick={() => handleDeleteTask(taskName)}>과제 삭제
                                         </button>
                                     </li>
                                 ))}
