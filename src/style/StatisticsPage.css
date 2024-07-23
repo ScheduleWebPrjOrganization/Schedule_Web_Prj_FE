@@ -1,0 +1,53 @@
+/* StatisticsPage.css */
+.statistics-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+.header {
+    width: 100%;
+    background-color: #f0f0f0;
+    padding: 10px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.statistics-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.statistics-summary {
+    margin-bottom: 20px;
+}
+
+.statistics-summary h2 {
+    margin-bottom: 10px;
+}
+
+.statistics-summary table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 10px;
+}
+
+.statistics-summary table th,
+.statistics-summary table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.statistics-summary table th {
+    background-color: #f4f4f4;
+}
+
+.calendar-container {
+    width: 100%;
+    max-width: 800px;
+}

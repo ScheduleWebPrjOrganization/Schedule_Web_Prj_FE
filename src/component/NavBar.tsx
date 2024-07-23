@@ -11,7 +11,7 @@ const NavBar: React.FC = () => {
                 <li><Link to="/calendar-show">달력</Link></li>
                 <li><Link to="/studygroup">스터디그룹</Link></li>
                 <li><Link to="/mypage">마이페이지</Link></li>
-                <li><Link to="/record">기록</Link></li>
+                <li><Link to="/statistics">통계</Link></li>
             </ul>
         </nav>
     );

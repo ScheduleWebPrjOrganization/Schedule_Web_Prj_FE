@@ -12,7 +12,7 @@ import CalendarPlan from "./pages/CalendarPlan";
 import CalendarShow from "./pages/CalendarShow";
 import Dashboard from "./pages/Dashboard";
 import {MyPage} from "./pages/MyPage";
-import {Record} from "./pages/Record";
+import Statistics from "./pages/Statistics";
 
 const App: React.FC = () => {
     return (
@@ -30,7 +30,7 @@ const App: React.FC = () => {
                     <Route path="/studygroup" element={<AllStudyGroup />} />
                     <Route path="/studygroup/:id" element={<StudyGroupDetails />} />
                     <Route path="/mypage" element={<MyPage />} />
-                    <Route path="/record" element={<Record />} />
+                    <Route path="/statistics" element={<Statistics />} />
                 </Routes>
             </div>
         </Router>
