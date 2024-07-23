@@ -62,6 +62,7 @@ async function addSubject(memberId: number, subjectName: string, dateKey: string
 }
 
 // 새로운 과제 추가하기
+//
 async function addTaskToSubject(subjectId: number, taskName: string, dateKey: string, plannedTime: number): Promise<void> {
     const taskData = {
         name: taskName,
@@ -107,6 +108,7 @@ function CalendarPlan() {
     const [currentSubject, setCurrentSubject] = useState<number | null>(null);
     const [newDayInput, setNewDayInput] = useState<string>("");
 
+    // 멤버 ID 1로 받음.
     const [memberId, setMemberId] = useState<number>(1);
     const currentDate = allDates[currentDateIndex];
     const currentDateKey = currentDate ? dayjs(currentDate).format("YYYY-MM-DD") : null;
@@ -187,6 +189,12 @@ function CalendarPlan() {
         }
     };
 
+    // 코드 문제점
+    // 1. 멤버 ID가 하드코딩되어 있음
+    // 2. 멤버에 Task 가 들어가면 StudyGroup findAll 할 때에 Task 가 같이 들어가게 됨
+    // 이 때에 Member Domain 에 Task 가 List 로 들어감.
+    // List<Task> 에 Member_id 가 존재하여 순환참조 발생
+    // -> 백엔드 코드 Task 에 jsonIgnore 추가(member, subject)
     const addNewTask = async () => {
         try {
             if (newTask && currentDateKey && currentSubject !== null && Object.keys(dateTasks[currentDateKey]?.subjects).length > 0) {
