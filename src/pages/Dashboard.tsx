@@ -4,12 +4,15 @@ import dayjs from "dayjs";
 import "../style/Dashboard.css";
 import { Task, DateTasks } from "./CalendarPlan";
 import Timer from "../component/Timer";
+import { Button, Modal } from "react-bootstrap";
 
 const API_URL = 'http://localhost:8080/api';
 
 function Dashboard() {
     const [currentDate, setCurrentDate] = useState<Date>(new Date());
     const [dateTasks, setDateTasks] = useState<DateTasks>({});
+    const [modalIsOpen, setModalIsOpen] = useState(false);
+    const [taskToDelete, setTaskToDelete] = useState<{ dateKey: string, subjectName: string, taskId: number, taskName: string } | null>(null);
 
     const goToPreviousDate = () => {
         const previousDate = dayjs(currentDate).subtract(1, 'day');
@@ -59,29 +62,45 @@ function Dashboard() {
         }
     };
 
-    const handleDeleteTask = async (dateKey: string, subjectName: string, taskId: number) => {
-        try {
-            await axios.delete(`${API_URL}/tasks/${taskId}`);
+    const openModal = (dateKey: string, subjectName: string, taskId: number, taskName: string) => {
+        setTaskToDelete({ dateKey, subjectName, taskId, taskName });
+        setModalIsOpen(true);
+    };
 
-            setDateTasks(prevDateTasks => {
-                const updatedDateTasks = { ...prevDateTasks };
+    const closeModal = () => {
+        setModalIsOpen(false);
+        setTaskToDelete(null);
+    };
 
-                if (updatedDateTasks[dateKey] && updatedDateTasks[dateKey].subjects[subjectName]) {
-                    updatedDateTasks[dateKey].subjects[subjectName].tasks = updatedDateTasks[dateKey].subjects[subjectName].tasks.filter(task => task.id !== taskId);
+    const confirmDeleteTask = async () => {
+        if (taskToDelete) {
+            const { dateKey, subjectName, taskId } = taskToDelete;
 
-                    if (updatedDateTasks[dateKey].subjects[subjectName].tasks.length === 0) {
-                        delete updatedDateTasks[dateKey].subjects[subjectName];
+            try {
+                await axios.delete(`${API_URL}/tasks/${taskId}`);
+
+                setDateTasks(prevDateTasks => {
+                    const updatedDateTasks = { ...prevDateTasks };
+
+                    if (updatedDateTasks[dateKey] && updatedDateTasks[dateKey].subjects[subjectName]) {
+                        updatedDateTasks[dateKey].subjects[subjectName].tasks = updatedDateTasks[dateKey].subjects[subjectName].tasks.filter(task => task.id !== taskId);
+
+                        if (updatedDateTasks[dateKey].subjects[subjectName].tasks.length === 0) {
+                            delete updatedDateTasks[dateKey].subjects[subjectName];
+                        }
+
+                        if (Object.keys(updatedDateTasks[dateKey].subjects).length === 0) {
+                            delete updatedDateTasks[dateKey];
+                        }
                     }
 
-                    if (Object.keys(updatedDateTasks[dateKey].subjects).length === 0) {
-                        delete updatedDateTasks[dateKey];
-                    }
-                }
+                    return updatedDateTasks;
+                });
 
-                return updatedDateTasks;
-            });
-        } catch (error) {
-            console.error("과제 삭제 오류:", error);
+                closeModal();
+            } catch (error) {
+                console.error("과제 삭제 오류:", error);
+            }
         }
     };
 
@@ -110,8 +129,12 @@ function Dashboard() {
                                     <li key={task.id}>
                                         <div>{task.name}</div>
                                         <div>목표 시간: {task.hoursToComplete} 분</div>
+                                        <div>실제 시간: {task.actualHours} 분</div>
                                         <div>상태: {task.status}</div>
-                                        <button onClick={() => handleDeleteTask(dayjs(currentDate).format("YYYY-MM-DD"), subjectName, task.id)}>삭제</button>
+                                        <Button
+                                            variant="danger"
+                                            onClick={() => openModal(dayjs(currentDate).format("YYYY-MM-DD"), subjectName, task.id, task.name)}>포기하기
+                                        </Button>
                                     </li>
                                 ))}
                             </ul>
@@ -119,6 +142,18 @@ function Dashboard() {
                     ))}
                 </div>
             </div>
+            <Modal show={modalIsOpen} onHide={closeModal} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>과제 삭제 확인</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p> 해당 날짜 {taskToDelete && `${taskToDelete.dateKey} - ${taskToDelete.subjectName} - ${taskToDelete.taskName} 과제를 진짜 포기하겠습니까?`}</p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="danger" onClick={confirmDeleteTask}>예</Button>
+                    <Button variant="secondary" onClick={closeModal}>아니오</Button>
+                </Modal.Footer>
+            </Modal>
         </div>
     );
 }

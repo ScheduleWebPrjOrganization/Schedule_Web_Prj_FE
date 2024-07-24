@@ -18,6 +18,7 @@ export interface Task {
     id: number;
     name: string;
     hoursToComplete: number;
+    actualHours: number;
     member_id: number;
     status: string;
     subject_id: number;

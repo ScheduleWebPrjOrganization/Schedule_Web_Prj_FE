@@ -82,6 +82,18 @@ const Statistics: React.FC = () => {
         fetchStatistics(dayjs(startDate).format('YYYY-MM-DD'), dayjs(endDate).format('YYYY-MM-DD'));
     };
 
+    const handleResetSelection = () => {
+        setCustomStartDate(null);
+        setCustomEndDate(null);
+        setSelectedRanges([]);
+    };
+
+    function convertMinutesToHoursAndMinutes(minutes: number) {
+        const hours = Math.floor(minutes / 60);
+        const remainingMinutes = minutes % 60;
+        return { hours, remainingMinutes };
+    }
+
     return (
         <div className="statistics-page">
             <div className="statistics-content">
@@ -98,17 +110,20 @@ const Statistics: React.FC = () => {
                     <table>
                         <thead>
                         <tr>
-                            <th>TASK</th>
+                            <th>Subject</th>
                             <th>누적 공부시간</th>
                         </tr>
                         </thead>
                         <tbody>
-                        {statistics.map(stat => (
-                            <tr key={stat.subjectName}>
-                                <td>{stat.subjectName}</td>
-                                <td>{stat.totalHours} 시간</td>
-                            </tr>
-                        ))}
+                        {statistics.map(stat => {
+                            const { hours, remainingMinutes } = convertMinutesToHoursAndMinutes(stat.totalHours);
+                            return (
+                                <tr key={stat.subjectName}>
+                                    <td>{stat.subjectName}</td>
+                                    <td>{hours} 시간 {remainingMinutes} 분</td>
+                                </tr>
+                            );
+                        })}
                         </tbody>
                     </table>
                 </div>
@@ -126,8 +141,12 @@ const Statistics: React.FC = () => {
                             }
                             return null;
                         }}
+                        value={customStartDate && customEndDate ? [customStartDate, customEndDate] : undefined}
                     />
-                    <button onClick={handleCustomDateFetch}>통계 조회</button>
+                    <div className="calendar-buttons">
+                        <button onClick={handleCustomDateFetch}>통계 조회</button>
+                        <button onClick={handleResetSelection}>초기화</button>
+                    </div>
                 </div>
             </div>
         </div>
