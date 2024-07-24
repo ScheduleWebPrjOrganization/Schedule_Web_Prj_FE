@@ -1,18 +1,20 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import LoginPage from './pages/login-page'; // 경로를 확인하세요
-import Register from './component/Register'; // 경로를 확인하세요
-import Home from './component/Home'; // 경로를 확인하세요
-import AllStudyGroup from "./component/AllStudyGroup"; // 경로를 확인하세요
-import StudyGroupDetails from "./component/StudyGroupDetails"; // 경로를 확인하세요
-import Timer from './component/Timer'; // 경로를 확인하세요
-import NavBar from "./component/NavBar"; // 경로를 확인하세요
-import CalendarPage from "./pages/CalendarPage"; // 경로를 확인하세요
-import CalendarPlan from "./pages/CalendarPlan"; // 경로를 확인하세요
-import CalendarShow from "./pages/CalendarShow"; // 경로를 확인하세요
-import Dashboard from "./pages/Dashboard"; // 경로를 확인하세요
-import {MyPage} from "./pages/MyPage"; // 경로를 확인하세요
-import {Record} from "./pages/Record"; // 경로를 확인하세요
+
+import Login from './component/Login';
+import Register from './component/Register';
+import Home from './component/Home';
+import AllStudyGroup from "./component/AllStudyGroup";
+import StudyGroupDetails from "./component/StudyGroupDetails";
+import Timer from './component/Timer';
+import NavBar from "./component/NavBar";
+import CalendarPage from "./pages/CalendarPage";
+import CalendarPlan from "./pages/CalendarPlan";
+import CalendarShow from "./pages/CalendarShow";
+import Dashboard from "./pages/Dashboard";
+import {MyPage} from "./pages/MyPage";
+import Statistics from "./pages/Statistics";
+
 
 const App: React.FC = () => {
     return (
@@ -30,7 +32,7 @@ const App: React.FC = () => {
                     <Route path="/studygroup" element={<AllStudyGroup />} />
                     <Route path="/studygroup/:id" element={<StudyGroupDetails />} />
                     <Route path="/mypage" element={<MyPage />} />
-                    <Route path="/record" element={<Record />} />
+                    <Route path="/statistics" element={<Statistics />} />
                 </Routes>
             </div>
         </Router>
