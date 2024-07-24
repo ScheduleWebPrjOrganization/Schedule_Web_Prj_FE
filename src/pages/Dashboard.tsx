@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import dayjs from "dayjs";
-import "../style/Dashboard.css";
+import "./css/dashboard.css";
 import { Task, DateTasks } from "./CalendarPlan";
 import Timer from "../component/Timer";
 import { Button, Modal } from "react-bootstrap";

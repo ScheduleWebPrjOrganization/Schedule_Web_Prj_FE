@@ -1,0 +1,13 @@
+.page-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* 화면의 전체 높이 사용 */
+    background-color: #f0f2f5; /* 배경색 설정 (선택사항) */
+}
+
+.form-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

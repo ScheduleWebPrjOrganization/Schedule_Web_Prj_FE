@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from '../config/AxiosConfig';
-import '../Timer.css';
+import './css/Timer.css';
 
 // TimerProps 인터페이스는 현재 비어 있지만, 필요한 경우 타이머 컴포넌트에 전달할 프로퍼티를 정의하는 데 사용할 수 있습니다.
 interface TimerProps {
