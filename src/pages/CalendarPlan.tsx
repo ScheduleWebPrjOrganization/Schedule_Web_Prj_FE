@@ -322,8 +322,9 @@ function CalendarPlan() {
                 <div className="subject-task">
                     <div className="subject">
                         <h3>과목</h3>
-                        <input value={newSubject} onChange={(e) => setNewSubject(e.target.value)} placeholder="새 과목"/>
-                        <button onClick={addNewSubject}>과목 추가</button>
+                        <input className="search-bar" value={newSubject} onChange={(e) => setNewSubject(e.target.value)} placeholder="새 과목"/>
+                        <button className="add-btn" onClick={addNewSubject}>과목 추가</button>
+
                     </div>
                     <div className="task">
                         <h3>과제</h3>
@@ -368,6 +369,7 @@ function CalendarPlan() {
                         </div>
                     ))}
             </div>
+            <div className="space"></div>
         </div>
     );
 }

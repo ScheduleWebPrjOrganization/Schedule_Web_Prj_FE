@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@emotion/react": "^11.13.0",
+    "@emotion/styled": "^11.13.0",
+    "@mui/material": "^5.16.4",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -22,8 +25,10 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "npm run build-css && react-scripts start",
+    "build": "npm run build-css && react-scripts build",
+    "build-css": "sass src/component/decoration/css/Snow.scss src/component/decoration/css/Snow.scss",
+    "watch-css": "sass --watch src/component/decoration/css/Snow.scss:src/component/decoration/css/Snow.css",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -33,7 +38,6 @@
       "react-app/jest"
     ]
   },
-
   "browserslist": {
     "production": [
       ">0.2%",
