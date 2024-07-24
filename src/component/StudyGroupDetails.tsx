@@ -3,11 +3,13 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import { StudyGroup, Member, Subject } from "../types";
 import './StudyGroupDetails.css';
+import { Task } from "../pages/CalendarPlan"
 
 const StudyGroupDetails: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const [studyGroup, setStudyGroup] = useState<StudyGroup | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [tasksBySubject, setTasksBySubject] = useState<{ [key: number]: Task[] }>({});
 
     useEffect(() => {
         axios.get(`http://localhost:8080/api/studygroup/id/${id}`)
@@ -20,6 +22,27 @@ const StudyGroupDetails: React.FC = () => {
                 setIsLoading(false);
             });
     }, [id]);
+
+    useEffect(() => {
+        if (studyGroup && studyGroup.members) {
+            studyGroup.members.forEach(member => {
+                if (member.subjects) {
+                    member.subjects.forEach(subject => {
+                        axios.get(`http://localhost:8080/api/subjects/${subject.id}/tasks`)
+                            .then(response => {
+                                setTasksBySubject(prev => ({
+                                    ...prev,
+                                    [subject.id]: response.data
+                                }));
+                            })
+                            .catch(error => {
+                                console.error(`Error fetching tasks for subject ${subject.id}`, error);
+                            });
+                    });
+                }
+            });
+        }
+    }, [studyGroup]);
 
     if (isLoading) {
         return <div>Loading...</div>;
@@ -42,7 +65,23 @@ const StudyGroupDetails: React.FC = () => {
                         <p>이름: {member.name}</p>
                         <p className="online-status">온라인 여부: {member.online ? '온라인' : '오프라인'}</p>
                         {member.online && member.subjects && (
-                            <p className="subjects">공부 과목: {member.subjects.map((subject: Subject) => subject.name).join(', ')}</p>
+                            <div>
+                                <p className="subjects"></p>
+                                <ul>
+                                    {member.subjects.map((subject: Subject) => (
+                                        <li key={subject.id}>
+                                            공부 과목 : {subject.name}
+                                            {tasksBySubject[subject.id] && (
+                                                <ul className="tasks"> Tasks:
+                                                    {tasksBySubject[subject.id].map((task: Task) => (
+                                                        <p key={task.id}>{task.name}</p>
+                                                    ))}
+                                                </ul>
+                                            )}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
                         )}
                     </li>
                 ))}
